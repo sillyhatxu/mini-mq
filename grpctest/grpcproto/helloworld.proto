@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package grpcproto;
+
+service UserService {
+    rpc SayHello (HelloRequest) returns (HelloResponse) {
+    }
+}
+
+message HelloRequest {
+    int64 userId = 1;
+}
+
+message HelloResponse {
+    string code = 1;
+    User body = 2;
+    string message = 3;
+    string extra = 4;
+
+    message User {
+        int64 userId = 1;
+        string userName = 2;
+        int32 age = 3;
+        bool isDelete = 4;
+        int64 createTime = 5;
+        bytes msg = 6;
+        repeated Address addressList = 7;
+    }
+
+    message Address {
+        int64 id = 1;
+        string address = 2;
+        string zipCode = 3;
+        string photo = 4;
+        bool isDelete = 5;
+    }
+}

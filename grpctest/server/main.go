@@ -23,9 +23,10 @@ package main
 
 import (
 	"context"
-	"github.com/sillyhatxu/mini-mq/grpctest/dto"
+	"github.com/sillyhatxu/mini-mq/grpctest/grpcproto"
 	"log"
 	"net"
+	"time"
 
 	"google.golang.org/grpc"
 )
@@ -38,9 +39,43 @@ const (
 type server struct{}
 
 // SayHello implements helloworld.GreeterServer
-func (s *server) SayHello(ctx context.Context, in *dto.HelloRequest) (*dto.HelloResponse, error) {
-	log.Printf("Received: %v", in.Message)
-	return &dto.HelloResponse{Message: "Return " + in.Message}, nil
+func (s *server) SayHello(ctx context.Context, in *grpcproto.HelloRequest) (*grpcproto.HelloResponse, error) {
+	log.Printf("Received: %#v", in)
+	return &grpcproto.HelloResponse{
+		Code: "SUCCESS",
+		Body: &grpcproto.HelloResponse_User{
+			UserId:     in.UserId,
+			UserName:   "UserName",
+			Age:        23,
+			IsDelete:   true,
+			CreateTime: time.Now().UnixNano() / int64(time.Millisecond),
+			Msg:        []byte("This is test msg"),
+			AddressList: []*grpcproto.HelloResponse_Address{
+				{
+					Id:       1,
+					Address:  "address 111111",
+					ZipCode:  "111111",
+					Photo:    "11111111",
+					IsDelete: false,
+				},
+				{
+					Id:       2,
+					Address:  "address 222222",
+					ZipCode:  "222222",
+					Photo:    "22222222",
+					IsDelete: false,
+				},
+				{
+					Id:       3,
+					Address:  "address 333333",
+					ZipCode:  "333333",
+					Photo:    "33333333",
+					IsDelete: false,
+				},
+			},
+		},
+		Message: "Success",
+	}, nil
 }
 
 func main() {
@@ -49,7 +84,7 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
-	//pb.RegisterGreeterServer(s, &server{})
+	grpcproto.RegisterUserServiceServer(s, &server{})
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
