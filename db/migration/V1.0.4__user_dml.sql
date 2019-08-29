@@ -1,1 +1,0 @@
-insert into user_info (login_name, password) values ('admin', '313233343536D41D8CD98F00B204E980');
