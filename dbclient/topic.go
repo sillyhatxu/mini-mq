@@ -35,6 +35,11 @@ insert into %s (topic,offset,body) values (?, ? , ?)
 `
 
 func InsertTopicData(topic string, offset int64, body []byte) error {
+	_, err := Client.Insert(fmt.Sprintf(insertTopicData, getTopicTableName(topic)), topic, offset, body)
+	return err
+}
+
+func InsertTopicDataTransaction(topic string, offset int64, body []byte) error {
 	err := Client.Transaction(func(tx *sql.Tx) error {
 		stm, err := tx.Prepare(fmt.Sprintf(insertTopicData, getTopicTableName(topic)))
 		if err != nil {

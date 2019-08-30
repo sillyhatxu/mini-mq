@@ -42,5 +42,9 @@ func FindTopic(topic string) (*model.TopicDetail, error) {
 }
 
 func InsertTopicData(topic string, offset int64, body []byte) error {
-	return dbclient.InsertTopicData(topic, offset, body)
+	err := dbclient.InsertTopicData(topic, offset, body)
+	if err != nil {
+		return err
+	}
+	return dbclient.UpdateTopic(topic, offset)
 }
