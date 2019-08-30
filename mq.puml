@@ -1,0 +1,28 @@
+@startuml
+
+class TopicConf {
+' -Topic
+ #Topic
+ #Offset: total offset
+' ~method1()
+' +method2()
+}
+
+class TopicGroup {
+ #Topic
+ #Group
+ #Offset : current consume offset
+ #ConsumerCount
+}
+
+class TopicDataA {
+ #Topic
+ #Group
+ #Offset: current data offset
+' #ConsumerCount
+}
+
+TopicConf <|-- TopicDataA
+TopicDataA <|-- TopicGroup
+
+@enduml
