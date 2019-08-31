@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/sillyhatxu/mini-mq/dbclient"
 	"github.com/sillyhatxu/mini-mq/utils/cache"
 	"github.com/stretchr/testify/assert"
@@ -21,11 +22,28 @@ type UserInfo struct {
 }
 
 func TestProduce(t *testing.T) {
-	dbclient.InitialDBClient("/Users/cookie/go/gopath/src/github.com/sillyhatxu/mini-mq/basic.db", "/Users/cookie/go/gopath/src/github.com/sillyhatxu/mini-mq/db/migration")
+	//dbclient.InitialDBClient(fmt.Sprintf("%s/basic.db", path), fmt.Sprintf("%s/db/migration", path))
+	dbclient.InitialDBClient(fmt.Sprintf("%s/basic.db", path), "")
 	cache.Initial()
 	userinfo := &UserInfo{Id: "ID_1001", MobileNumber: "555555", Name: "test", Paid: true, FirstActionDeviceId: "deviceid", TestNumber: 10, TestNumber64: 64, TestDate: time.Now()}
 	userJSON, err := json.Marshal(userinfo)
 	assert.Nil(t, err)
 	err = Produce("test_topic", userJSON)
 	assert.Nil(t, err)
+}
+
+//10W data  50.537781494s
+func TestProduceBatch(t *testing.T) {
+	//dbclient.InitialDBClient(fmt.Sprintf("%s/basic.db", path), fmt.Sprintf("%s/db/migration", path))
+	dbclient.InitialDBClient(fmt.Sprintf("%s/basic.db", path), "")
+	cache.Initial()
+	start := time.Now()
+	for i := 1; i < 100000; i++ {
+		userinfo := &UserInfo{Id: fmt.Sprintf("ID_%v", i), MobileNumber: "555555", Name: fmt.Sprintf("test-%v", i), Paid: true, FirstActionDeviceId: "deviceid", TestNumber: 10, TestNumber64: 64, TestDate: time.Now()}
+		userJSON, err := json.Marshal(userinfo)
+		assert.Nil(t, err)
+		err = Produce("test_topic", userJSON)
+		assert.Nil(t, err)
+	}
+	fmt.Println(time.Since(start))
 }

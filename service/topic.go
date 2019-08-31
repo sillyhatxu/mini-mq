@@ -8,11 +8,11 @@ import (
 )
 
 func CreateTopic(topic string) error {
-	err := dbclient.CreateTopicDataTable(topic)
+	err := dbclient.InsertTopic(topic)
 	if err != nil {
 		return err
 	}
-	return dbclient.InsertTopic(topic)
+	return dbclient.CreateTopicDataTable(topic)
 }
 
 func UpdateTopic(topic string, offset int64) error {
@@ -36,15 +36,16 @@ func FindTopic(topic string) (*model.TopicDetail, error) {
 		return nil, err
 	}
 	if td != nil {
-		cache.Client.Set(topic, &td, client.NoExpiration)
+		cache.Client.Set(topic, td, client.NoExpiration)
 	}
 	return td, nil
 }
 
 func InsertTopicData(topic string, offset int64, body []byte) error {
-	err := dbclient.InsertTopicData(topic, offset, body)
-	if err != nil {
-		return err
-	}
-	return dbclient.UpdateTopic(topic, offset)
+	return dbclient.InsertTopicDataTransaction(topic, offset, body)
+	//err := dbclient.InsertTopicData(topic, offset, body)
+	//if err != nil {
+	//	return err
+	//}
+	//return dbclient.UpdateTopic(topic, offset)
 }
