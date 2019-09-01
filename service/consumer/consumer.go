@@ -6,14 +6,22 @@ import (
 	"github.com/sillyhatxu/mini-mq/service/topic"
 )
 
-type Consumer struct {
+type ConsumeGroup struct {
 	TopicName    string
 	TopicGroup   string
 	Offset       int64
 	ConsumeCount int
 }
 
-//
+func NewConsumeGroup(TopicName string, TopicGroup string, Offset int64, ConsumeCount int) *ConsumeGroup {
+	return &ConsumeGroup{
+		TopicName:    TopicName,
+		TopicGroup:   TopicGroup,
+		Offset:       Offset,
+		ConsumeCount: ConsumeCount,
+	}
+}
+
 //type Consumer struct {
 //	Topic        string
 //	Group        string
@@ -23,19 +31,19 @@ type Consumer struct {
 //}
 
 //chanel
-func (c *Consumer) Consume() ([]model.TopicData, error) {
-	topicGroup, err := topic.FindTopicGroup(c.TopicName, c.TopicGroup, c.Offset)
+func (cg *ConsumeGroup) Consume() ([]model.TopicData, error) {
+	topicGroup, err := topic.FindTopicGroup(cg.TopicName, cg.TopicGroup, cg.Offset)
 	if err != nil {
 		return nil, err
 	}
-	topicDataArray, err := dbclient.FindTopicData(c.TopicName, topicGroup.Offset, c.ConsumeCount)
+	topicDataArray, err := dbclient.FindTopicData(cg.TopicName, topicGroup.Offset, cg.ConsumeCount)
 	if err != nil {
 		return nil, err
 	}
-	c.Offset = topicGroup.Offset + int64(len(topicDataArray))
+	cg.Offset = topicGroup.Offset + int64(len(topicDataArray))
 	return topicDataArray, nil
 }
 
-func (c *Consumer) Commit() error {
-	return topic.UpdateTopicGroup(c.TopicName, c.TopicGroup, c.Offset)
+func (cg *ConsumeGroup) Commit() error {
+	return topic.UpdateTopicGroup(cg.TopicName, cg.TopicGroup, cg.Offset)
 }
