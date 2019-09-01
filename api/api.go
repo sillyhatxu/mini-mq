@@ -4,14 +4,19 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/sillyhatxu/convenient-utils/response"
 	"github.com/sirupsen/logrus"
+	"net"
 	"net/http"
 )
 
-func InitialAPI() error {
+func InitialAPI(listener net.Listener) {
 	logrus.Info("---------- initial internal api start ----------")
 	router := SetupRouter()
 	//return router.Run(config.Conf.Http.Listen)
-	return router.Run(":8081")
+	//return router.Run(":8080")
+	err := http.Serve(listener, router)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func SetupRouter() *gin.Engine {

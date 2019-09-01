@@ -2,15 +2,14 @@ package main
 
 import (
 	"context"
-	"log"
-	"time"
-
 	"github.com/sillyhatxu/mini-mq/grpctest/grpcproto"
 	"google.golang.org/grpc"
+	"log"
+	"time"
 )
 
 const (
-	address     = "localhost:50051"
+	address     = "localhost:8081"
 	defaultName = "world"
 )
 
