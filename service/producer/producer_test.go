@@ -1,4 +1,4 @@
-package service
+package producer
 
 import (
 	"encoding/json"
@@ -20,6 +20,10 @@ type UserInfo struct {
 	TestNumber64        int64     `json:"test_number_64" mapstructure:"test_number_64"`
 	TestDate            time.Time `json:"test_date" mapstructure:"test_date"`
 }
+
+const path = "/Users/shikuanxu/go/src/github.com/sillyhatxu/mini-mq"
+
+//const path = "/Users/cookie/go/gopath/src/github.com/sillyhatxu/mini-mq"
 
 func TestProduce(t *testing.T) {
 	//dbclient.InitialDBClient(fmt.Sprintf("%s/basic.db", path), fmt.Sprintf("%s/db/migration", path))
