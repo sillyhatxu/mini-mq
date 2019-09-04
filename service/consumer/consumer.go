@@ -2,6 +2,7 @@ package consumer
 
 import (
 	"github.com/sillyhatxu/mini-mq/dbclient"
+	"github.com/sillyhatxu/mini-mq/dto"
 	"github.com/sillyhatxu/mini-mq/model"
 	"github.com/sillyhatxu/mini-mq/service/topic"
 )
@@ -22,16 +23,7 @@ func NewConsumeGroup(TopicName string, TopicGroup string, Offset int64, ConsumeC
 	}
 }
 
-//type Consumer struct {
-//	Topic        string
-//	Group        string
-//	Offset       *int64
-//	ConsumeCount int
-//	Timeout      time.Duration
-//}
-
-//chanel
-func (cg *ConsumeGroup) Consume() ([]model.TopicData, error) {
+func (cg *ConsumeGroup) Consume() ([]dto.TopicData, error) {
 	topicGroup, err := topic.FindTopicGroup(cg.TopicName, cg.TopicGroup, cg.Offset)
 	if err != nil {
 		return nil, err
@@ -41,7 +33,20 @@ func (cg *ConsumeGroup) Consume() ([]model.TopicData, error) {
 		return nil, err
 	}
 	cg.Offset = topicGroup.Offset + int64(len(topicDataArray))
-	return topicDataArray, nil
+	return toDTO(topicDataArray, cg.TopicGroup), nil
+}
+
+func toDTO(array []model.TopicData, topicGroup string) []dto.TopicData {
+	var resultArray []dto.TopicData
+	for _, td := range array {
+		resultArray = append(resultArray, dto.TopicData{
+			TopicName:  td.TopicName,
+			TopicGroup: topicGroup,
+			Offset:     td.Offset,
+			Body:       td.Body,
+		})
+	}
+	return resultArray
 }
 
 func (cg *ConsumeGroup) Commit() error {

@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package grpcserver;
+
+service ProducerService {
+    rpc Produce (ProduceRequest) returns (ProduceResponse) {}
+}
+
+message ProduceRequest {
+    string topicName = 1;
+    bytes body = 2;
+}
+
+message ProduceResponse {
+    string code = 1;
+    string message = 2;
+}

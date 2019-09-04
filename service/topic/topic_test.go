@@ -7,9 +7,9 @@ import (
 	"testing"
 )
 
-const path = "/Users/shikuanxu/go/src/github.com/sillyhatxu/mini-mq"
+//const path = "/Users/shikuanxu/go/src/github.com/sillyhatxu/mini-mq"
 
-//const path = "/Users/cookie/go/gopath/src/github.com/sillyhatxu/mini-mq"
+const path = "/Users/cookie/go/gopath/src/github.com/sillyhatxu/mini-mq"
 
 func TestCreateTopic(t *testing.T) {
 	dbclient.InitialDBClient(fmt.Sprintf("%s/basic.db", path), fmt.Sprintf("%s/db/migration", path))

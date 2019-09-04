@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package grpcserver;
+
+service ConsumerService {
+    rpc Consume (ConsumeRequest) returns (ConsumeResponse) {
+    }
+    rpc Commit (CommitRequest) returns (CommitResponse) {
+    }
+}
+
+message ConsumeRequest {
+    string topicName = 1;
+    string topicGroup = 2;
+    int64 offset = 3;
+    int32 consumeCount = 4;
+}
+
+message ConsumeResponse {
+    string code = 1;
+    repeated Body body = 2;
+    string message = 3;
+
+    message Body {
+        string topicName = 1;
+        string topicGroup = 2;
+        int64 offset = 3;
+        bytes body = 4;
+    }
+}
+
+message CommitRequest {
+    string topicName = 1;
+    string topicGroup = 2;
+    int64 latestOffset = 3;
+}
+
+message CommitResponse {
+    string code = 1;
+    string message = 3;
+}
