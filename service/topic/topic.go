@@ -56,6 +56,13 @@ func FindTopic(topicName string) (*model.TopicDetail, error) {
 }
 
 func FindTopicGroup(topicName string, topicGroup string, offset int64) (tg *model.TopicGroup, err error) {
+	topicDetail, err := FindTopic(topicName)
+	if err != nil {
+		return nil, err
+	}
+	if topicDetail == nil {
+		return nil, fmt.Errorf("[%s] does not exist", topicName)
+	}
 	value, found := cache.Client.Get(getTopicGroupKey(topicName, topicGroup))
 	if found {
 		result := value.(*model.TopicGroup)

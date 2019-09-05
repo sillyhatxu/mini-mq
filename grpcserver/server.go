@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/sillyhatxu/mini-mq/dto"
 	"github.com/sillyhatxu/mini-mq/service/consumer"
+	"github.com/sillyhatxu/mini-mq/service/producer"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"net"
@@ -29,6 +30,13 @@ type produce struct{}
 
 func (p *produce) Produce(ctx context.Context, in *ProduceRequest) (*ProduceResponse, error) {
 	logrus.Infof("Received: %#v", in)
+	err := producer.Produce(in.TopicName, in.Body)
+	if err != nil {
+		return &ProduceResponse{
+			Code:    CodeError,
+			Message: err.Error(),
+		}, nil
+	}
 	return &ProduceResponse{
 		Code:    CodeSuccess,
 		Message: CodeSuccess,
@@ -49,22 +57,27 @@ func (p *consume) Consume(ctx context.Context, in *ConsumeRequest) (*ConsumeResp
 	}
 	return &ConsumeResponse{
 		Code:    CodeSuccess,
-		Body:    toResponseBody(array),
+		Body:    toResponseBody(cg, array),
 		Message: CodeSuccess,
 	}, nil
 }
 
-func toResponseBody(array []dto.TopicData) []*ConsumeResponse_Body {
-	var resultArray []*ConsumeResponse_Body
+func toResponseBody(consumeGroup *consumer.ConsumeGroup, array []dto.TopicData) *ConsumeResponse_Body {
+	var resultArray []*ConsumeResponse_TopicData
 	for _, td := range array {
-		resultArray = append(resultArray, &ConsumeResponse_Body{
+		resultArray = append(resultArray, &ConsumeResponse_TopicData{
 			TopicName:  td.TopicName,
 			TopicGroup: td.TopicGroup,
 			Offset:     td.Offset,
 			Body:       td.Body,
 		})
 	}
-	return resultArray
+	return &ConsumeResponse_Body{
+		TopicName:      consumeGroup.TopicName,
+		TopicGroup:     consumeGroup.TopicGroup,
+		LatestOffset:   consumeGroup.Offset,
+		TopicDataArray: resultArray,
+	}
 }
 
 func (p *consume) Commit(ctx context.Context, in *CommitRequest) (*CommitResponse, error) {

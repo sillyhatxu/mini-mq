@@ -18,10 +18,17 @@ message ConsumeRequest {
 
 message ConsumeResponse {
     string code = 1;
-    repeated Body body = 2;
+    Body body = 2;
     string message = 3;
 
     message Body {
+        string topicName = 1;
+        string topicGroup = 2;
+        int64 latestOffset = 3;
+        repeated TopicData topicDataArray = 4;
+    }
+
+    message TopicData {
         string topicName = 1;
         string topicGroup = 2;
         int64 offset = 3;
