@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/sillyhatxu/mini-mq/api"
 	"github.com/sillyhatxu/mini-mq/dbclient"
-	"github.com/sillyhatxu/mini-mq/grpcserver"
+	"github.com/sillyhatxu/mini-mq/grpc/server"
 	"github.com/sillyhatxu/mini-mq/utils/cache"
 	"net"
 )
@@ -20,7 +20,7 @@ func main() {
 		panic(err)
 	}
 	go api.InitialAPI(apiListener)
-	go grpcserver.InitialGRPC(grpcListener)
+	go server.InitialGRPC(grpcListener)
 	var c = make(chan bool)
 	<-c
 }

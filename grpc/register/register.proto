@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package register;
+
+service RegisterService {
+    rpc Register (RegisterRequest) returns (RegisterResponse) {
+    }
+}
+
+message RegisterRequest {
+    string topicName = 1;
+    string topicGroup = 2;
+}
+
+
+message RegisterResponse {
+    string code = 1;
+    string message = 2;
+}

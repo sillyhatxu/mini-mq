@@ -3,7 +3,6 @@ package client
 import (
 	"context"
 	"fmt"
-	"github.com/sillyhatxu/mini-mq/client/consumer"
 	"github.com/sillyhatxu/mini-mq/grpcserver"
 	"google.golang.org/grpc"
 	"time"
@@ -14,32 +13,11 @@ type Client struct {
 	Timeout time.Duration
 }
 
-func (c Client) Consume(TopicName string, TopicGroup string, Offset int64, ConsumeCount int) (*consumer.Group, error) {
-	body, err := c.getTopicData(TopicName, TopicGroup, Offset, int32(ConsumeCount))
-	if err != nil {
-		return nil, err
-	}
-	var resultArray []consumer.TopicData
-	for _, td := range body.TopicDataArray {
-		resultArray = append(resultArray, consumer.TopicData{
-			TopicName:  td.TopicName,
-			TopicGroup: td.TopicGroup,
-			Offset:     td.Offset,
-			Body:       td.Body,
-		})
-	}
-	return &consumer.Group{
-		TopicName:      body.TopicName,
-		TopicGroup:     body.TopicGroup,
-		LatestOffset:   body.LatestOffset,
-		TopicDataArray: resultArray,
-	}, nil
-}
-
-func (c Client) getConnection() (*grpc.ClientConn, error) {
+func (c *Client) getConnection() (*grpc.ClientConn, error) {
 	return grpc.Dial(c.Address, grpc.WithInsecure())
 }
-func (c Client) getTopicData(TopicName string, TopicGroup string, Offset int64, ConsumeCount int32) (*grpcserver.ConsumeResponse_Body, error) {
+
+func (c Client) GetTopicData(TopicName string, TopicGroup string, Offset int64, ConsumeCount int32) (*grpcserver.ConsumeResponse_Body, error) {
 	conn, err := c.getConnection()
 	if err != nil {
 		return nil, err
@@ -62,6 +40,28 @@ func (c Client) getTopicData(TopicName string, TopicGroup string, Offset int64, 
 	}
 	return response.Body, nil
 }
+
+//func (c Client) Consume(TopicName string, TopicGroup string, Offset int64, ConsumeCount int) (*consumer.Group, error) {
+//	body, err := c.getTopicData(TopicName, TopicGroup, Offset, int32(ConsumeCount))
+//	if err != nil {
+//		return nil, err
+//	}
+//	var resultArray []consumer.TopicData
+//	for _, td := range body.TopicDataArray {
+//		resultArray = append(resultArray, consumer.TopicData{
+//			TopicName:  td.TopicName,
+//			TopicGroup: td.TopicGroup,
+//			Offset:     td.Offset,
+//			Body:       td.Body,
+//		})
+//	}
+//	return &consumer.Group{
+//		TopicName:      body.TopicName,
+//		TopicGroup:     body.TopicGroup,
+//		LatestOffset:   body.LatestOffset,
+//		TopicDataArray: resultArray,
+//	}, nil
+//}
 
 func (c Client) Commit(TopicName string, TopicGroup string, LatestOffset int64) error {
 	conn, err := c.getConnection()

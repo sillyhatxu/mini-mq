@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package grpcserver;
+package consumer;
 
 service ConsumerService {
     rpc Consume (ConsumeRequest) returns (ConsumeResponse) {
