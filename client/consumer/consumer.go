@@ -42,10 +42,14 @@ func (cc ConsumerClient) Validate() error {
 }
 
 type ConsumerInterface interface {
-	MessageDelivery(msg Delivery)
+	MessageDelivery(msg Delivery) error
 }
 
 func (cc ConsumerClient) Consume(ci ConsumerInterface) error {
+	err := cc.Validate()
+	if err != nil {
+		return err
+	}
 	if cc.Client == nil {
 		return fmt.Errorf("mq client is nil; ConsumerClient : %#v", cc)
 	}
@@ -57,7 +61,18 @@ func (cc ConsumerClient) Consume(ci ConsumerInterface) error {
 	go func() {
 		for delivery := range msgs {
 			logrus.Infof("delivery : %#v", delivery)
-			ci.MessageDelivery(delivery)
+			err := ci.MessageDelivery(delivery)
+			if err != nil {
+				logrus.Errorf("message delivery; Error : %v", err)
+				continue
+			}
+			if cc.Config.AutoAck {
+				err := cc.Client.Commit(cc.TopicName, cc.TopicGroup, delivery.LatestOffset)
+				if err != nil {
+					logrus.Errorf("message delivery; Error : %v", err)
+					continue
+				}
+			}
 		}
 	}()
 	logrus.Info("waiting for messages.")
@@ -68,26 +83,29 @@ func (cc ConsumerClient) Consume(ci ConsumerInterface) error {
 }
 
 func (cc ConsumerClient) messageDelivery() (<-chan Delivery, error) {
-	time.Sleep(*cc.Config.Hearbeat)
 	deliveryChannel := make(chan Delivery)
-	body, err := cc.Client.GetTopicData(cc.TopicName, cc.TopicGroup, cc.Offset, cc.ConsumeCount)
-	if err != nil {
-		return nil, err
-	}
-	var resultArray []DeliveryData
-	for _, td := range body.TopicDataArray {
-		resultArray = append(resultArray, DeliveryData{
-			TopicName:  td.TopicName,
-			TopicGroup: td.TopicGroup,
-			Offset:     td.Offset,
-			Body:       td.Body,
-		})
-	}
-	deliveryChannel <- *&Delivery{
-		TopicName:      body.TopicName,
-		TopicGroup:     body.TopicGroup,
-		LatestOffset:   body.LatestOffset,
-		TopicDataArray: resultArray,
-	}
+	go func() {
+		time.Sleep(*cc.Config.Hearbeat)
+		body, err := cc.Client.GetTopicData(cc.TopicName, cc.TopicGroup, cc.Offset, cc.ConsumeCount)
+		if err != nil {
+			logrus.Errorf("get topic data error; %v", err)
+			return
+		}
+		var resultArray []DeliveryData
+		for _, td := range body.TopicDataArray {
+			resultArray = append(resultArray, DeliveryData{
+				TopicName:  td.TopicName,
+				TopicGroup: td.TopicGroup,
+				Offset:     td.Offset,
+				Body:       td.Body,
+			})
+		}
+		deliveryChannel <- *&Delivery{
+			TopicName:      body.TopicName,
+			TopicGroup:     body.TopicGroup,
+			LatestOffset:   body.LatestOffset,
+			TopicDataArray: resultArray,
+		}
+	}()
 	return (<-chan Delivery)(deliveryChannel), nil
 }

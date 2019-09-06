@@ -10,6 +10,7 @@ service RegisterService {
 message RegisterRequest {
     string topicName = 1;
     string topicGroup = 2;
+    string address = 3;
 }
 
 
