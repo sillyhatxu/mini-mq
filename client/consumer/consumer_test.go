@@ -1,8 +1,8 @@
 package consumer
 
 import (
+	"github.com/sillyhatxu/mini-mq/client"
 	"github.com/sirupsen/logrus"
-	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
 )
@@ -10,19 +10,36 @@ import (
 const (
 	Address      = "localhost:8082"
 	TopicName    = "test_topic"
-	TopicGroup   = "test-1"
+	TopicGroup   = "test-3"
 	Offset       = 0
 	ConsumeCount = 5
 )
 
+type ConsumerTest struct{}
+
+func (ct ConsumerTest) MessageDelivery(delivery Delivery) error {
+	logrus.Infof("delivery { TopicName:%v, TopicGroup:%v, LatestOffset:%v }", delivery.TopicName, delivery.TopicGroup, delivery.LatestOffset)
+	return nil
+}
+
 func TestClient_Consume(t *testing.T) {
-	Client := &Client{Address: Address, Timeout: 60 * time.Second}
-	group, err := Client.Consume(TopicName, TopicGroup, Offset, ConsumeCount)
-	assert.Nil(t, err)
-	logrus.Infof("TopicGroup [%v] TopicName [%v] LatestOffset [%v]", group.TopicGroup, group.TopicName, group.LatestOffset)
-	for i, td := range group.TopicDataArray {
-		logrus.Infof("%d ;TopicGroup [%v] TopicName [%v] Offset [%v] Body : %v", i, td.TopicGroup, td.TopicName, td.Offset, string(td.Body))
+	Client := &ConsumerClient{
+		TopicName:    TopicName,
+		TopicGroup:   TopicGroup,
+		Offset:       Offset,
+		ConsumeCount: ConsumeCount,
+		Client: &client.Client{
+			Address: Address,
+			Timeout: 60 * time.Second,
+		},
+		Config: &ConsumerConfig{
+			Hearbeat: 5 * time.Second,
+			NoWait:   true,
+			AutoAck:  true,
+		},
 	}
-	err = Client.Commit(group.TopicName, group.TopicGroup, group.LatestOffset)
-	assert.Nil(t, err)
+	err := Client.Consume(&ConsumerTest{})
+	if err != nil {
+		panic(err)
+	}
 }

@@ -3,9 +3,15 @@ package producer
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/sillyhatxu/mini-mq/client"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
+)
+
+const (
+	Address   = "localhost:8082"
+	TopicName = "test_topic"
 )
 
 func TestClient_Produce(t *testing.T) {
@@ -22,7 +28,14 @@ func TestClient_Produce(t *testing.T) {
 	userinfo := &UserInfo{Id: fmt.Sprintf("ID_%v", 1), MobileNumber: "555555", Name: fmt.Sprintf("test-%v", 1), Paid: true, FirstActionDeviceId: "deviceid", TestNumber: 10, TestNumber64: 64, TestDate: time.Now()}
 	userJSON, err := json.Marshal(userinfo)
 	assert.Nil(t, err)
-	Client := &Client{Address: Address, Timeout: 60 * time.Second}
-	err = Client.Produce(TopicName, userJSON)
+	pc := ProducerClient{
+		TopicName: TopicName,
+		Body:      userJSON,
+		Client: &client.Client{
+			Address: Address,
+			Timeout: 60 * time.Second,
+		},
+	}
+	err = pc.Produce()
 	assert.Nil(t, err)
 }

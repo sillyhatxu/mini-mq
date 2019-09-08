@@ -9,7 +9,8 @@ import (
 )
 
 func main() {
-	dbclient.InitialDBClient("./basic.db", "/Users/cookie/go/gopath/src/github.com/sillyhatxu/mini-mq/db/migration")
+	dbclient.InitialDBClient("./basic.db", "/Users/shikuanxu/go/src/github.com/sillyhatxu/mini-mq/db/migration")
+	//dbclient.InitialDBClient("./basic.db", "/Users/cookie/go/gopath/src/github.com/sillyhatxu/mini-mq/db/migration")
 	cache.Initial()
 	apiListener, err := net.Listen("tcp", ":8081")
 	if err != nil {
