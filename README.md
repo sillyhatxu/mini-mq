@@ -1,12 +1,21 @@
 # mini-mq
 
-## Initialize your project
+## sample
+
+[consumer](https://github.com/sillyhatxu/mini-mq/blob/master/client/consumer/consumer_test.go)
+
+[producer](https://github.com/sillyhatxu/mini-mq/blob/master/client/producer/producer_test.go)
+
+
+## develop backups
+
+### Initialize your project
 
 ```
 dep init
 ```
 
-## Adding a dependency
+### Adding a dependency
 
 ```
 dep ensure -add github.com/foo/bar github.com/foo/baz...
@@ -14,7 +23,7 @@ dep ensure -add github.com/foo/bar github.com/foo/baz...
 dep ensure -add github.com/foo/bar@1.0.0 github.com/foo/baz@master
 ```
 
-## Updating dependencies
+### Updating dependencies
 
 ```
 dep ensure -update github.com/sillyhatxu/convenient-utils
@@ -24,13 +33,13 @@ dep ensure -update
 
 # Release Template
 
-### Feature
+#### Feature
 
 * [NEW] Support for Go Modules [#17](https://github.com/sillyhatxu/convenient-utils/issues/17)
 
 ---
 
-### Bug fix
+#### Bug fix
 
 * [FIX] Truncate Latency precision in long running request [#17](https://github.com/sillyhatxu/convenient-utils/issues/17)
 
@@ -42,37 +51,37 @@ git push origin v1.0.2
 ```
 
 
-## Initialize your project
+### Initialize your project
 
 ```
 go mod init mini-mq
 ```
 
-## Updating dependencies
+### Updating dependencies
 
 ```
 go mod vendor
 ```
 
-## verify dependencies
+### verify dependencies
 
 ```
 go mod verify
 ```
 
-## remove dependencies that is not used
+### remove dependencies that is not used
 
 ```
 go mod tidy
 ```
 
-## print dependence diagram
+### print dependence diagram
 
 ```
 go mod graph
 ```
 
-## download dependencies
+### download dependencies
 
 ```
 go mod download
@@ -80,18 +89,18 @@ go mod download
 
 # Release Template
 
-### Feature
+#### Feature
 
 * [NEW] Support for Go Modules [#17](https://github.com/sillyhatxu/convenient-utils/issues/17)
 
 ---
 
-### Bug fix
+#### Bug fix
 
 * [FIX] Truncate Latency precision in long running request [#17](https://github.com/sillyhatxu/convenient-utils/issues/17)
 
 
-## 发布订阅(Publish/Subscribe)
+### 发布订阅(Publish/Subscribe)
 
 > 使用sqlite做数据库
 >
