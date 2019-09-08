@@ -1,5 +1,5 @@
 git add .
-git commit -m 'release environment-config'
+git commit -m 'finish mini mq'
 git push origin develop
 git checkout master
 git pull
