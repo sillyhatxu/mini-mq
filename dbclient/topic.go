@@ -30,6 +30,48 @@ func CreateTopicDataTable(topicName string) error {
 	return Client.ExecDDL(fmt.Sprintf(createTopicDataTableSQL, table, table, table))
 }
 
+const dropTopicDataTableSQL = `
+drop table %s
+`
+
+const deleteTopicGroupSQL = `
+delete from topic_group where topic_name = ? and topic_group = ?
+`
+
+const deleteTopicDetailSQL = `
+delete from topic_detail where topic_name = ?
+`
+
+func DeleteTopic(topicName string, topicGroupArray []model.TopicGroup) error {
+	return Client.Transaction(func(tx *sql.Tx) error {
+		err := Client.ExecDDL(fmt.Sprintf(dropTopicDataTableSQL, getTopicDataTableName(topicName)))
+		if err != nil {
+			return err
+		}
+		for _, tg := range topicGroupArray {
+			stm, err := tx.Prepare(deleteTopicGroupSQL)
+			if err != nil {
+				return err
+			}
+			defer stm.Close()
+			_, err = stm.Exec(tg.TopicName, tg.TopicGroup)
+			if err != nil {
+				return err
+			}
+		}
+		stm, err := tx.Prepare(deleteTopicDetailSQL)
+		if err != nil {
+			return err
+		}
+		defer stm.Close()
+		_, err = stm.Exec(topicName)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+}
+
 const insertTopicData = `
 insert into %s (topic_name,offset,body) values (?, ? , ?)
 `
@@ -106,6 +148,19 @@ func FindByTopicGroup(topicName string, topicGroup string) (*model.TopicGroup, e
 	var tg *model.TopicGroup
 	err := Client.FindFirst(findByTopicGroup, &tg, topicName, topicGroup)
 	return tg, err
+}
+
+const findByTopicGroupByTopicName = `
+select * from topic_group where topic_name = ?
+`
+
+func FindByTopicGroupByTopicName(topicName string) ([]model.TopicGroup, error) {
+	var array []model.TopicGroup
+	err := Client.FindList(findByTopicGroupByTopicName, &array, topicName)
+	if array == nil {
+		array = make([]model.TopicGroup, 0)
+	}
+	return array, err
 }
 
 const insertTopicGroup = `

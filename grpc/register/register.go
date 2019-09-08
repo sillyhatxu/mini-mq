@@ -12,7 +12,6 @@ type Register struct{}
 func (p *Register) Register(ctx context.Context, in *RegisterRequest) (*RegisterResponse, error) {
 	logrus.Infof("Received: %#v", in)
 	//TODO return error check
-	//err := register.Register(in.GetTopicName(), in.GetTopicGroup(), in.Address)
 	err := register.Register(in.GetTopicName(), in.GetTopicGroup(), in.Address)
 	if err != nil {
 		return &RegisterResponse{

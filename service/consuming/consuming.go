@@ -59,11 +59,11 @@ func GetConsumingMap() map[string]*Consuming {
 }
 
 func (rc RegisterConsumer) Register() error {
-	topicDetail, err := topic.FindTopic(rc.TopicName)
+	td, err := topic.FindTopic(rc.TopicName)
 	if err != nil {
 		return nil
 	}
-	if topicDetail == nil {
+	if td == nil {
 		return fmt.Errorf("topic[%s] does not exist", rc.TopicName)
 	}
 	consumingMap := GetConsumingMap()

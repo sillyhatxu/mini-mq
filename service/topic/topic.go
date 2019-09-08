@@ -6,67 +6,179 @@ import (
 	"github.com/sillyhatxu/mini-mq/dbclient"
 	"github.com/sillyhatxu/mini-mq/model"
 	"github.com/sillyhatxu/mini-mq/utils/cache"
+	"github.com/sirupsen/logrus"
+	"sync"
+	"time"
 )
 
 const (
-	topicDetailKey = "TOPIC_DETAIL_%s"
-	topicGroupKey  = "TOPIC_GROUP_%s_%s"
+	topicDetailKey = "TOPIC_DETAIL"
+	topicGroupKey  = "TOPIC_GROUP"
 )
 
-func getTopicDetailKey(topicName string) string {
-	return fmt.Sprintf(topicDetailKey, topicName)
-}
-
-func getTopicGroupKey(topicName string, topicGroup string) string {
-	return fmt.Sprintf(topicGroupKey, topicName, topicGroup)
-}
-
-func CreateTopic(topicName string) error {
-	err := dbclient.InsertTopicDetail(topicName)
-	if err != nil {
-		return err
+//TODO channel
+func getTopicDetailMap() map[string]*model.TopicDetail {
+	var mutex sync.Mutex
+	mutex.Lock()
+	defer mutex.Unlock()
+	for {
+		value, found := cache.Client.Get(topicDetailKey)
+		if !found {
+			logrus.Infof("initial topic detail map[%s]", topicDetailKey)
+			continue
+		}
+		return value.(map[string]*model.TopicDetail)
 	}
-	return dbclient.CreateTopicDataTable(topicName)
 }
 
-func UpdateTopic(topicName string, offset int64) error {
-	value, found := cache.Client.Get(topicName)
-	if found {
-		result := value.(*model.TopicDetail)
-		result.Offset = offset
-		cache.Client.Set(topicName, &result, client.NoExpiration)
-	}
-	return dbclient.UpdateTopicDetail(topicName, offset)
+func setTopicDetailMap(topicName string, td *model.TopicDetail) {
+	var mutex sync.Mutex
+	mutex.Lock()
+	defer mutex.Unlock()
+	topicDetailMap := getTopicDetailMap()
+	topicDetailMap[topicName] = td
+	cache.Client.Set(topicDetailKey, topicDetailMap, client.NoExpiration)
+}
+
+func deleteTopicDetailMap(topicName string) {
+	var mutex sync.Mutex
+	mutex.Lock()
+	defer mutex.Unlock()
+	topicDetailMap := getTopicDetailMap()
+	delete(topicDetailMap, topicName)
+	cache.Client.Set(topicDetailKey, topicDetailMap, client.NoExpiration)
 }
 
 func FindTopic(topicName string) (*model.TopicDetail, error) {
-	value, found := cache.Client.Get(getTopicDetailKey(topicName))
-	if found {
-		result := value.(*model.TopicDetail)
-		return result, nil
+	var mutex sync.Mutex
+	mutex.Lock()
+	defer mutex.Unlock()
+	topicDetailMap := getTopicDetailMap()
+	topicDetail, ok := topicDetailMap[topicName]
+	if ok {
+		return topicDetail, nil
 	}
 	td, err := dbclient.FindByTopicDetail(topicName)
 	if err != nil {
 		return nil, err
 	}
 	if td != nil {
-		cache.Client.Set(getTopicDetailKey(topicName), td, client.NoExpiration)
+		setTopicDetailMap(topicName, td)
 	}
 	return td, nil
 }
 
-func FindTopicGroup(topicName string, topicGroup string, offset int64) (tg *model.TopicGroup, err error) {
-	topicDetail, err := FindTopic(topicName)
+func CreateTopic(topicName string) error {
+	td, err := FindTopic(topicName)
+	if err != nil {
+		return err
+	}
+	if td != nil {
+		return fmt.Errorf("[%s]topic name has been exist", topicName)
+	}
+	err = dbclient.InsertTopicDetail(topicName)
+	if err != nil {
+		return err
+	}
+	err = dbclient.CreateTopicDataTable(topicName)
+	if err != nil {
+		return err
+	}
+	setTopicDetailMap(topicName, &model.TopicDetail{TopicName: topicName, Offset: 0, CreatedTime: time.Now(), LastModifiedTime: time.Now()})
+	return nil
+}
+
+func UpdateTopic(topicName string, offset int64) error {
+	td, err := FindTopic(topicName)
+	if err != nil {
+		return err
+	}
+	if td == nil {
+		return fmt.Errorf("topic[%s] does not exist", topicName)
+	}
+	err = dbclient.UpdateTopicDetail(topicName, offset)
+	if err != nil {
+		return err
+	}
+	td.Offset = offset
+	setTopicDetailMap(topicName, td)
+	return nil
+}
+
+func DeleteTopic(topicName string) error {
+	var mutex sync.Mutex
+	mutex.Lock()
+	defer mutex.Unlock()
+	td, err := FindTopic(topicName)
+	if err != nil {
+		return err
+	}
+	if td == nil {
+		return fmt.Errorf("topic[%s] does not exist", topicName)
+	}
+	topicGroupArray, err := dbclient.FindByTopicGroupByTopicName(topicName)
+	if err != nil {
+		return err
+	}
+	for _, topicGroup := range topicGroupArray {
+		deleteTopicGroupMap(&topicGroup)
+	}
+	deleteTopicDetailMap(topicName)
+	return dbclient.DeleteTopic(topicName, topicGroupArray)
+}
+
+func getTopicGroupMap() map[string]*model.TopicGroup {
+	var mutex sync.Mutex
+	mutex.Lock()
+	defer mutex.Unlock()
+	for {
+		value, found := cache.Client.Get(topicGroupKey)
+		if !found {
+			logrus.Infof("initial topic group map[%s]", topicGroupKey)
+			continue
+		}
+		return value.(map[string]*model.TopicGroup)
+	}
+}
+
+//TODO channel
+func getTopicGroupMapKey(topicName string, topicGroup string) string {
+	return fmt.Sprintf("%s_%s", topicName, topicGroup)
+}
+
+func setTopicGroupMap(topicName string, topicGroup string, tg *model.TopicGroup) {
+	var mutex sync.Mutex
+	mutex.Lock()
+	defer mutex.Unlock()
+	topicGroupMap := getTopicGroupMap()
+	topicGroupMap[getTopicGroupMapKey(topicName, topicGroup)] = tg
+	cache.Client.Set(topicGroupKey, topicGroupMap, client.NoExpiration)
+}
+
+func deleteTopicGroupMap(tg *model.TopicGroup) {
+	var mutex sync.Mutex
+	mutex.Lock()
+	defer mutex.Unlock()
+	topicGroupMap := getTopicGroupMap()
+	delete(topicGroupMap, getTopicGroupMapKey(tg.TopicName, tg.TopicGroup))
+	cache.Client.Set(topicGroupKey, topicGroupMap, client.NoExpiration)
+}
+
+func FindTopicGroup(topicName string, topicGroup string, offset int64) (*model.TopicGroup, error) {
+	var mutex sync.Mutex
+	mutex.Lock()
+	defer mutex.Unlock()
+	td, err := FindTopic(topicName)
 	if err != nil {
 		return nil, err
 	}
-	if topicDetail == nil {
-		return nil, fmt.Errorf("[%s] does not exist", topicName)
+	if td == nil {
+		return nil, fmt.Errorf("topic[%s] does not exist", topicName)
 	}
-	value, found := cache.Client.Get(getTopicGroupKey(topicName, topicGroup))
-	if found {
-		result := value.(*model.TopicGroup)
-		return result, nil
+	topicGroupMap := getTopicGroupMap()
+	tg, ok := topicGroupMap[getTopicGroupMapKey(topicName, topicGroup)]
+	if ok {
+		return tg, nil
 	}
 	tg, err = dbclient.FindByTopicGroup(topicName, topicGroup)
 	if err != nil {
@@ -83,17 +195,8 @@ func FindTopicGroup(topicName string, topicGroup string, offset int64) (tg *mode
 			Offset:     offset,
 		}
 	}
-	cache.Client.Set(getTopicGroupKey(topicName, topicGroup), tg, client.NoExpiration)
+	setTopicGroupMap(topicName, topicGroup, tg)
 	return tg, nil
-}
-
-func InsertTopicData(topicName string, offset int64, body []byte) error {
-	return dbclient.InsertTopicDataTransaction(topicName, offset, body)
-	//err := dbclient.InsertTopicData(topic, offset, body)
-	//if err != nil {
-	//	return err
-	//}
-	//return dbclient.UpdateTopic(topic, offset)
 }
 
 func UpdateTopicGroup(topicName string, topicGroup string, offset int64) error {
@@ -106,6 +209,15 @@ func UpdateTopicGroup(topicName string, topicGroup string, offset int64) error {
 	if err != nil {
 		return err
 	}
-	cache.Client.Set(getTopicGroupKey(topicName, topicGroup), tg, client.NoExpiration)
+	setTopicGroupMap(topicName, topicGroup, tg)
 	return nil
+}
+
+func InsertTopicData(topicName string, offset int64, body []byte) error {
+	return dbclient.InsertTopicDataTransaction(topicName, offset, body)
+	//err := dbclient.InsertTopicData(topic, offset, body)
+	//if err != nil {
+	//	return err
+	//}
+	//return dbclient.UpdateTopic(topic, offset)
 }

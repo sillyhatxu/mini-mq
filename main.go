@@ -1,22 +1,41 @@
 package main
 
 import (
+	"flag"
+	"fmt"
+	"github.com/BurntSushi/toml"
+	"github.com/sillyhatxu/environment-config"
 	"github.com/sillyhatxu/mini-mq/api"
+	"github.com/sillyhatxu/mini-mq/config"
 	"github.com/sillyhatxu/mini-mq/dbclient"
 	"github.com/sillyhatxu/mini-mq/grpc/server"
 	"github.com/sillyhatxu/mini-mq/utils/cache"
+	"log"
 	"net"
 )
 
+func init() {
+	cfgFile := flag.String("-c", "config-local.conf", "config file")
+	flag.Parse()
+	envconfig.ParseConfig(*cfgFile, func(content []byte) {
+		err := toml.Unmarshal(content, &config.Conf)
+		if err != nil {
+			panic(fmt.Sprintf("unmarshal toml object error. %v", err))
+		}
+	})
+	log.Printf("config.Conf : %#v", config.Conf)
+	config.InitialLogConfig()
+}
+
 func main() {
-	dbclient.InitialDBClient("./basic.db", "/Users/shikuanxu/go/src/github.com/sillyhatxu/mini-mq/db/migration")
-	//dbclient.InitialDBClient("./basic.db", "/Users/cookie/go/gopath/src/github.com/sillyhatxu/mini-mq/db/migration")
+	//os.Getenv()
+	dbclient.InitialDBClient(config.Conf.DB.DataSourceName, config.Conf.DB.DDLPath)
 	cache.Initial()
-	apiListener, err := net.Listen("tcp", ":8081")
+	apiListener, err := net.Listen("tcp", fmt.Sprintf(":%d", config.Conf.HttpPort))
 	if err != nil {
 		panic(err)
 	}
-	grpcListener, err := net.Listen("tcp", ":8082")
+	grpcListener, err := net.Listen("tcp", fmt.Sprintf(":%d", config.Conf.GRPCPort))
 	if err != nil {
 		panic(err)
 	}
