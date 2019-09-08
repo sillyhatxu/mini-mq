@@ -15,7 +15,7 @@ import (
 )
 
 func init() {
-	cfgFile := flag.String("-c", "config-local.conf", "config file")
+	cfgFile := flag.String("c", "config-local.conf", "config file")
 	flag.Parse()
 	envconfig.ParseConfig(*cfgFile, func(content []byte) {
 		err := toml.Unmarshal(content, &config.Conf)
