@@ -17,6 +17,10 @@ import (
 func init() {
 	cfgFile := flag.String("c", "config-local.conf", "config file")
 	flag.Parse()
+	err := envconfig.ParseEnvironmentConfig(&config.Conf.EnvConfig)
+	if err != nil {
+		panic(err)
+	}
 	envconfig.ParseConfig(*cfgFile, func(content []byte) {
 		err := toml.Unmarshal(content, &config.Conf)
 		if err != nil {
@@ -28,7 +32,6 @@ func init() {
 }
 
 func main() {
-	//os.Getenv()
 	dbclient.InitialDBClient(config.Conf.DB.DataSourceName, config.Conf.DB.DDLPath)
 	cache.Initial()
 	apiListener, err := net.Listen("tcp", fmt.Sprintf(":%d", config.Conf.HttpPort))

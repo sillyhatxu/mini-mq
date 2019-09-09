@@ -3,11 +3,14 @@ version: '3.4'
 services:
   mini-mq:
     image: xushikuan/mini-mq:latest
+    env:
+      - name: CGO_ENABLED
+        value: 1
     volumes:
       - ./demo/data/:/go/data/
       - ./demo/logs/:/go/logs/
     ports:
-      - 8801:8080
+      - 6601:8080
     deploy:
       replicas: 1
       restart_policy:

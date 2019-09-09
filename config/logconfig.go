@@ -46,7 +46,7 @@ func InitialLogConfig() {
 	if Conf.Log.OpenLogstash {
 		conf.LogstashConf = &logstashhook.LogstashConf{
 			LogFormatter: jsonFormatter,
-			Address:      Conf.Log.LogstashAddress,
+			Address:      Conf.EnvConfig.LogstashURL,
 		}
 	}
 	conf.Initial()

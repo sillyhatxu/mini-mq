@@ -3,12 +3,17 @@ package config
 var Conf config
 
 type config struct {
-	HttpPort int `toml:"http_port"`
-	GRPCPort int `toml:"grpc_port"`
-	Project  string
-	Module   string
-	Log      logConf  `toml:"log_conf"`
-	DB       database `toml:"database"`
+	Project   string
+	Module    string
+	HttpPort  int               `toml:"http_port"`
+	GRPCPort  int               `toml:"grpc_port"`
+	Log       logConf           `toml:"log_conf"`
+	DB        database          `toml:"database"`
+	EnvConfig environmentConfig `toml:"env_config"`
+}
+
+type environmentConfig struct {
+	LogstashURL string `toml:"logstash_url" env:"logstash_url"`
 }
 
 type database struct {
@@ -17,10 +22,9 @@ type database struct {
 }
 
 type logConf struct {
-	OpenLogstash    bool   `toml:"open_logstash"`
-	OpenLogfile     bool   `toml:"open_logfile"`
-	FilePath        string `toml:"file_path"`
-	LogstashAddress string `toml:"logstash_address"`
+	OpenLogstash bool   `toml:"open_logstash"`
+	OpenLogfile  bool   `toml:"open_logfile"`
+	FilePath     string `toml:"file_path"`
 }
 
 //type MQConf struct {

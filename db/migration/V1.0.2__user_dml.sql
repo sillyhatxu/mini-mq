@@ -1,0 +1,1 @@
+insert into user_info (login_name, password) values ('admin', '41646D696E6973747261746F72D41D8C')
