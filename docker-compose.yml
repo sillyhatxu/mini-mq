@@ -3,9 +3,6 @@ version: '3.4'
 services:
   mini-mq:
     image: xushikuan/mini-mq:latest
-    env:
-      - name: CGO_ENABLED
-        value: 1
     volumes:
       - ./demo/data/:/go/data/
       - ./demo/logs/:/go/logs/
