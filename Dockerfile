@@ -1,12 +1,14 @@
-FROM golang:1.12 AS builder
+FROM golang:1.13 AS builder
 
 ENV GOPATH=/usr/local/go/src/github.com/sillyhatxu
 #ARG PROJECT_NAME
 ENV PROJECT_NAME=mini-mq
 WORKDIR $GOPATH/$PROJECT_NAME
+#ADD . $GOPATH/$PROJECT_NAME
 COPY . $GOPATH/$PROJECT_NAME
 
-RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -o main main.go
+RUN apt-get update && apt-get install -y gcc-aarch64-linux-gnu
+RUN CGO_ENABLED=1 CC=aarch64-linux-gnu-gcc GOOS=linux GOARCH=amd64 go build -o main main.go
 
 FROM xushikuan/alpine-build:1.0
 
