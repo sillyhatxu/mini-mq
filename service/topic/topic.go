@@ -25,6 +25,8 @@ func getTopicDetailMap() map[string]*model.TopicDetail {
 		value, found := cache.Client.Get(topicDetailKey)
 		if !found {
 			logrus.Infof("initial topic detail map[%s]", topicDetailKey)
+			topicDetailMap := make(map[string]*model.TopicDetail)
+			cache.Client.Set(topicDetailKey, topicDetailMap, client.NoExpiration)
 			continue
 		}
 		return value.(map[string]*model.TopicDetail)

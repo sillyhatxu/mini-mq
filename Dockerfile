@@ -1,12 +1,19 @@
-FROM golang:1.13 AS builder
+FROM golang:1.12 AS builder
 
 ENV GOPATH=/usr/local/go/src
 ENV PROJECT_NAME=github.com/sillyhatxu/mini-mq
 
-RUN go get github.com/sillyhatxu/mini-mq
-RUN dep ensure -update
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install -y git && \
+    apt-get install go-dep
+
+RUN git clone https://github.com/sillyhatxu/mini-mq.git $GOPATH/$PROJECT_NAME
 RUN apt-get update && apt-get install -y gcc-aarch64-linux-gnu
+
 WORKDIR $GOPATH/$PROJECT_NAME
+COPY . .
+RUN ls
 RUN CGO_ENABLED=1 CC=aarch64-linux-gnu-gcc GOOS=linux GOARCH=amd64 go build -o main main.go
 
 FROM xushikuan/alpine-build:1.0

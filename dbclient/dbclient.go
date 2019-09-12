@@ -1,11 +1,11 @@
 package dbclient
 
-import "github.com/sillyhatxu/sqlite-client"
+import "github.com/sillyhatxu/mysql-client"
 
-var Client *sqliteclient.SqliteClient
+var Client *dbclient.MysqlClient
 
 func InitialDBClient(dataSourceName string, ddlPath string) {
-	Client = sqliteclient.NewSqliteClient(dataSourceName, ddlPath)
+	Client = dbclient.NewMysqlClientConf(dataSourceName, dbclient.DDLPath(ddlPath))
 	err := Client.Initial()
 	if err != nil {
 		panic(err)

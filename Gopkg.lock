@@ -39,6 +39,14 @@
   version = "v1.4.0"
 
 [[projects]]
+  digest = "1:ec6f9bf5e274c833c911923c9193867f3f18788c461f76f05f62bb1510e0ae65"
+  name = "github.com/go-sql-driver/mysql"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "72cd26f257d44c1114970e19afddcd812016007e"
+  version = "v1.4.1"
+
+[[projects]]
   digest = "1:fe8273f3c5693e536bbe05d92ab8d05a70fa5806d2d90510bb0d5106c140cc2c"
   name = "github.com/golang/protobuf"
   packages = [
@@ -105,14 +113,6 @@
   version = "v0.0.9"
 
 [[projects]]
-  digest = "1:79e87abf06b873987dee86598950f5b51732ac454d5a5cab6445a14330e6c9e3"
-  name = "github.com/mattn/go-sqlite3"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "b612a2feea6aa87c6d052d9086572551df06497e"
-  version = "v1.11.0"
-
-[[projects]]
   digest = "1:53bc4cd4914cd7cd52139990d5170d6dc99067ae31c56530621b18b35fc30318"
   name = "github.com/mitchellh/mapstructure"
   packages = ["."]
@@ -169,12 +169,9 @@
   version = "v2.4"
 
 [[projects]]
-  digest = "1:7ae430020c2f97abb0b1fde70ccb236b82d6c4433b95824b5fdd690958a9e2f0"
+  digest = "1:b7e3ec6ee74a5585400bf39db76a0f67251379594d55b28829d962a6bfbb67e2"
   name = "github.com/sillyhatxu/convenient-utils"
-  packages = [
-    "encryption/hash",
-    "response",
-  ]
+  packages = ["response"]
   pruneopts = "UT"
   revision = "bb22717029d99565ee478592c018ceda91b867d5"
   version = "v1.1.4"
@@ -210,20 +207,20 @@
   version = "v2.0.1"
 
 [[projects]]
-  digest = "1:b36688d1d06dae87e9a46d41ae46e034bba30cbf4282e5f1317a07b8bda094c8"
+  digest = "1:6bf718f7f53252f0c49e40be7fc815953c72fdaa1c4605df44323680d966c510"
+  name = "github.com/sillyhatxu/mysql-client"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "924f63425672bf9c5ffb33c6f647104318727e4c"
+  version = "v1.0.4"
+
+[[projects]]
+  digest = "1:76e0be37969db3c796e3fac2739bc15c0618c6a33ec1670e878eb35fcd79677a"
   name = "github.com/sillyhatxu/retry-utils"
   packages = ["."]
   pruneopts = "UT"
-  revision = "eb47917a3af1b1c52fefaf5bf8b2c0782806b125"
-  version = "v1.0.0"
-
-[[projects]]
-  branch = "master"
-  digest = "1:62754ed480814f0379bf35301c82ad24cb8e7be682910c85a3b08ebf13ebca3a"
-  name = "github.com/sillyhatxu/sqlite-client"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "7d08e634d439e50f0e4bc86bd35aabf9faf8f09a"
+  revision = "f967bf349ac26a6cbad64de926ab176816216004"
+  version = "v1.0.1"
 
 [[projects]]
   digest = "1:04457f9f6f3ffc5fea48e71d62f2ca256637dee0a04d710288e27e05c8b41976"
@@ -270,7 +267,7 @@
   name = "golang.org/x/sys"
   packages = ["unix"]
   pruneopts = "UT"
-  revision = "bbd175535a8b9969bb0b33f1502f681ee0b122bd"
+  revision = "7ad0cfa0b7b5a50bdf0fb49923febdf3742a975c"
 
 [[projects]]
   digest = "1:8d8faad6b12a3a4c819a3f9618cb6ee1fa1cfc33253abeeea8b55336721e3405"
@@ -298,15 +295,23 @@
   version = "v0.3.2"
 
 [[projects]]
+  digest = "1:c25289f43ac4a68d88b02245742347c94f1e108c534dda442188015ff80669b3"
+  name = "google.golang.org/appengine"
+  packages = ["cloudsql"]
+  pruneopts = "UT"
+  revision = "5f2a59506353b8d5ba8cbbcd9f3c1f41f1eaf079"
+  version = "v1.6.2"
+
+[[projects]]
   branch = "master"
   digest = "1:583a0c80f5e3a9343d33aea4aead1e1afcc0043db66fdf961ddd1fe8cd3a4faf"
   name = "google.golang.org/genproto"
   packages = ["googleapis/rpc/status"]
   pruneopts = "UT"
-  revision = "92dd089d5514cecde7a465f807541f83dfd486d5"
+  revision = "1774047e7e5133fa3573a4e51b37a586b6b0360c"
 
 [[projects]]
-  digest = "1:3b97661db2e5d4c87f7345e875ea28f911e54c715ba0a74be08e1649d67e05cd"
+  digest = "1:2e18183989c76d073e9088f1a56f8b1c46ca920b74b529a50c2d7e5877ff18ac"
   name = "google.golang.org/grpc"
   packages = [
     ".",
@@ -344,8 +349,8 @@
     "tap",
   ]
   pruneopts = "UT"
-  revision = "6eaf6f47437a6b4e2153a190160ef39a92c7eceb"
-  version = "v1.23.0"
+  revision = "39e8a7b072a67ca2a75f57fa2e0d50995f5b22f6"
+  version = "v1.23.1"
 
 [[projects]]
   digest = "1:cbc72c4c4886a918d6ab4b95e347ffe259846260f99ebdd8a198c2331cf2b2e9"
@@ -378,8 +383,8 @@
     "github.com/sillyhatxu/logrus-client",
     "github.com/sillyhatxu/logrus-client/filehook",
     "github.com/sillyhatxu/logrus-client/logstashhook",
+    "github.com/sillyhatxu/mysql-client",
     "github.com/sillyhatxu/retry-utils",
-    "github.com/sillyhatxu/sqlite-client",
     "github.com/sirupsen/logrus",
     "github.com/stretchr/testify/assert",
     "google.golang.org/grpc",

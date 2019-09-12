@@ -54,10 +54,6 @@
   version = "2.0.1"
 
 [[constraint]]
-  branch = "master"
-  name = "github.com/sillyhatxu/sqlite-client"
-
-[[constraint]]
   name = "github.com/sirupsen/logrus"
   version = "1.4.2"
 
