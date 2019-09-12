@@ -11,13 +11,13 @@ const (
 	createTopicDataTableSQL = `
 CREATE TABLE IF NOT EXISTS %s
 (
-  id           bigint(48)   NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  topic_name   varchar(100) NOT NULL,
-  offset       bigint(48)            DEFAULT 0,
-  body         BLOB         NOT NULL,
-  created_time timestamp(3) NOT NULL DEFAULT current_timestamp(3),
-  INDEX (topic_name)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+  id           INTEGER PRIMARY KEY AUTOINCREMENT,
+  topic_name   TEXT NOT NULL,
+  offset       INTEGER  DEFAULT 0,
+  body         BLOB     DEFAULT 0,
+  created_time datetime default current_timestamp
+);
+CREATE INDEX idx_%s_topic ON %s (topic_name);
 	`
 )
 
@@ -27,7 +27,7 @@ func getTopicDataTableName(topicName string) string {
 
 func CreateTopicDataTable(topicName string) error {
 	table := getTopicDataTableName(topicName)
-	return Client.ExecDDL(fmt.Sprintf(createTopicDataTableSQL, table))
+	return Client.ExecDDL(fmt.Sprintf(createTopicDataTableSQL, table, table, table))
 }
 
 const dropTopicDataTableSQL = `
@@ -122,7 +122,7 @@ func InsertTopicDetail(topicName string) error {
 }
 
 const updateTopicDetail = `
-update topic_detail set offset = ? where topic_name = ?
+update topic_detail set offset = ?,last_modified_time = datetime('now') where topic_name = ?
 `
 
 func UpdateTopicDetail(topicName string, offset int64) error {
