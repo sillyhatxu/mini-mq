@@ -14,6 +14,7 @@ const path = "/Users/cookie/go/gopath/src/github.com/sillyhatxu/mini-mq"
 const dataSourceName = "sillyhat:sillyhat@tcp(127.0.0.1:3308)/sillyhat_minimq?loc=Asia%2FSingapore&parseTime=true"
 
 func init() {
+	dbclient.InitialDBClient(fmt.Sprintf("%s/basic.db", path), fmt.Sprintf("%s/db/migration", path))
 	cache.Initial()
 	dbclient.InitialDBClient(dataSourceName, fmt.Sprintf("%s/db/migration", path))
 }

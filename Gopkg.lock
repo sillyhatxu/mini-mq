@@ -207,20 +207,20 @@
   version = "v2.0.1"
 
 [[projects]]
-  digest = "1:6bf718f7f53252f0c49e40be7fc815953c72fdaa1c4605df44323680d966c510"
-  name = "github.com/sillyhatxu/mysql-client"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "924f63425672bf9c5ffb33c6f647104318727e4c"
-  version = "v1.0.4"
-
-[[projects]]
   digest = "1:76e0be37969db3c796e3fac2739bc15c0618c6a33ec1670e878eb35fcd79677a"
   name = "github.com/sillyhatxu/retry-utils"
   packages = ["."]
   pruneopts = "UT"
   revision = "f967bf349ac26a6cbad64de926ab176816216004"
   version = "v1.0.1"
+
+[[projects]]
+  digest = "1:d11d617ea4b4e3f1168f0a138673a831781062fadf4ff5d4190a6f9a6d82cd60"
+  name = "github.com/sillyhatxu/sqlite-client"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "6bf3c6e757da3619c3c4e81437a8ea43b32ce055"
+  version = "v1.0.0"
 
 [[projects]]
   digest = "1:04457f9f6f3ffc5fea48e71d62f2ca256637dee0a04d710288e27e05c8b41976"
