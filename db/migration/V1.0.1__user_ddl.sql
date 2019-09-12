@@ -1,10 +1,10 @@
 CREATE TABLE IF NOT EXISTS user_info
 (
-  id                 INTEGER PRIMARY KEY AUTOINCREMENT,
-  login_name         TEXT NOT NULL,
-  password           TEXT NOT NULL,
-  status             INTEGER  DEFAULT 1,
-  created_time       datetime default current_timestamp,
-  last_modified_time datetime default current_timestamp
-);
-CREATE INDEX idx_login_name_status ON user_info (login_name, status);
+  id                 bigint(48)                                NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  login_name         varchar(100)                              NOT NULL,
+  password           varchar(100)                              NOT NULL,
+  status             int          DEFAULT 1,
+  created_time       timestamp(3) NOT NULL DEFAULT current_timestamp(3),
+  last_modified_time timestamp(3) NOT NULL DEFAULT current_timestamp(3) ON UPDATE current_timestamp(3),
+  INDEX (login_name, status)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
