@@ -1,0 +1,155 @@
+FROM golang:1.11-alpine AS build_base
+# Install some dependencies needed to build the project
+RUN apk add bash ca-certificates git gcc g++ libc-dev
+WORKDIR /go/src/github.com/creativesoftwarefdn/weaviate
+# Force the go compiler to use modules
+ENV GO111MODULE=on
+# We want to populate the module cache based on the go.{mod,sum} files.
+COPY go.mod .
+COPY go.sum .
+
+#This is the ‘magic’ step that will download all the dependencies that are specified in
+# the go.mod and go.sum file.
+
+# Because of how the layer caching system works in Docker, the go mod download
+# command will _ only_ be re-run when the go.mod or go.sum file change
+# (or when we add another docker instruction this line)
+RUN go mod download
+
+# This image builds the weavaite server
+FROM build_base AS server_builder
+# Here we copy the rest of the source code
+COPY . .
+# And compile the project
+RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go install -a -tags netgo -ldflags '-w -extldflags "-static"' ./cmd/weaviate-server
+
+#In this last stage, we start from a fresh Alpine image, to reduce the image size and not ship the Go compiler in our production artifacts.
+FROM alpine AS weaviate
+# We add the certificates to be able to verify remote weaviate instances
+RUN apk add ca-certificates
+# Finally we copy the statically compiled Go binary.
+COPY --from=server_builder /go/bin/weaviate-server /bin/weaviate
+ENTRYPOINT ["/bin/weaviate"]
+
+
+
+#FROM golang:1.11-alpine AS build_base
+## Install some dependencies needed to build the project
+#RUN apk add bash ca-certificates git gcc g++ libc-dev
+#WORKDIR /go/src/github.com/creativesoftwarefdn/weaviate
+## Force the go compiler to use modules
+#ENV GO111MODULE=on
+## We want to populate the module cache based on the go.{mod,sum} files.
+#COPY go.mod .
+#COPY go.sum .
+#
+##This is the ‘magic’ step that will download all the dependencies that are specified in
+## the go.mod and go.sum file.
+#
+## Because of how the layer caching system works in Docker, the go mod download
+## command will _ only_ be re-run when the go.mod or go.sum file change
+## (or when we add another docker instruction this line)
+#RUN go mod download
+#
+## This image builds the weavaite server
+#FROM build_base AS server_builder
+## Here we copy the rest of the source code
+#COPY . .
+## And compile the project
+#RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go install -a -tags netgo -ldflags '-w -extldflags "-static"' ./cmd/weaviate-server
+#
+##In this last stage, we start from a fresh Alpine image, to reduce the image size and not ship the Go compiler in our production artifacts.
+#FROM alpine AS weaviate
+## We add the certificates to be able to verify remote weaviate instances
+#RUN apk add ca-certificates
+## Finally we copy the statically compiled Go binary.
+#COPY --from=server_builder /go/bin/weaviate-server /bin/weaviate
+#ENTRYPOINT ["/bin/weaviate"]
+
+
+
+
+FROM golang:1.12 AS builder
+
+ENV PROJECT_NAME=/usr/local/go/src/github.com/sillyhatxu/mini-mq
+
+#RUN go get github.com/sillyhatxu/mini-mq
+#RUN apt-get update && apt-get install -y gcc-aarch64-linux-gnu
+WORKDIR $PROJECT_NAME
+COPY . .
+RUN ls
+RUN pwd
+RUN go install -a -tags netgo -ldflags '-w -extldflags "-static"'
+RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -o main main.go
+#RUN CGO_ENABLED=1 CC=aarch64-linux-gnu-gcc GOOS=linux GOARCH=amd64 go build -o main main.go
+#RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go install -a -tags netgo -ldflags '-w -extldflags "-static"' ./cmd/weaviate-server
+#RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64  build -o main main.go
+#RUN CGO_ENABLED=1 CC=aarch64-linux-gnu-gcc GOOS=linux GOARCH=arm64 go build -o app .
+
+FROM xushikuan/alpine-build:1.0
+
+ENV GOPATH=/usr/local/go/src
+ENV PROJECT_NAME=github.com/sillyhatxu/mini-mq
+ENV TIME_ZONE=Asia/Singapore
+RUN ln -snf /usr/share/zoneinfo/$TIME_ZONE /etc/localtime && echo $TIME_ZONE > /etc/timezone
+
+WORKDIR /go
+COPY --from=build /app/bin/server /app/bin/server
+COPY --from=builder $GOPATH/$PROJECT_NAME/main .
+COPY --from=builder $GOPATH/$PROJECT_NAME/config.conf .
+COPY --from=builder $GOPATH/$PROJECT_NAME/db ./data
+ENTRYPOINT ./main -c config.conf
+
+
+
+FROM golang:1.11 AS builder
+
+# Magic line, notice in use that the lib name is different!
+RUN apt-get update && apt-get install -y gcc-aarch64-linux-gnu
+# Add your app and do what you need to for dependencies
+ADD . /go/src/github.com/org/repo
+WORKDIR /go/src/github.com/go/repo
+RUN CGO_ENABLED=1 CC=aarch64-linux-gnu-gcc GOOS=linux GOARCH=arm64 go build -o app .
+
+# Final stage - pick any old arm64 image you want
+FROM multiarch/ubuntu-core:arm64-bionic
+
+WORKDIR /root/
+
+COPY --from=builder /go/src/github.com/org/repo/app .
+CMD ["./app"]
+
+
+#FROM xushikuan/alpine-build:1.0
+#
+#ENV GOPATH=/usr/local/go/src/github.com/sillyhatxu
+#ARG PROJECT_NAME
+#ENV TIME_ZONE=Asia/Singapore
+#RUN ln -snf /usr/share/zoneinfo/$TIME_ZONE /etc/localtime && echo $TIME_ZONE > /etc/timezone
+#
+#WORKDIR /go
+#COPY main .
+#COPY db ./data
+#COPY config.conf .
+#ENTRYPOINT ./main -c config.conf
+
+
+#RUN               GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o main main.go
+#RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -o main main.go
+
+#FROM golang:1.13-alpine
+#
+#ENV GOPATH=/go
+#ENV TIME_ZONE=Asia/Singapore
+#
+#RUN apk add --no-cache tzdata
+#RUN apk --update --no-cache add curl
+#RUN apk add --no-cache ca-certificates
+#RUN ln -snf /usr/share/zoneinfo/$TIME_ZONE /etc/localtime && echo $TIME_ZONE > /etc/timezone
+#RUN CGO_ENABLED=1 GOOS=linux go install -a server
+#
+#WORKDIR /go
+#COPY main .
+#COPY db ./data
+#COPY config.conf .
+#ENTRYPOINT ./main -c config.conf
