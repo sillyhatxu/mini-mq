@@ -3,6 +3,7 @@ package dbclient
 import (
 	"database/sql"
 	"fmt"
+	"github.com/mitchellh/mapstructure"
 	"github.com/sillyhatxu/mini-mq/model"
 )
 
@@ -130,13 +131,39 @@ func UpdateTopicDetail(topicName string, offset int64) error {
 	return err
 }
 
+const findByTopicDetailList = `
+select * from topic_detail
+`
+
+func FindByTopicDetailList() ([]model.TopicDetail, error) {
+	var tdArray []model.TopicDetail
+	config := &mapstructure.DecoderConfig{
+		DecodeHook:       mapstructure.StringToTimeHookFunc("2006-01-02T15:04:05Z"),
+		WeaklyTypedInput: true,
+		Result:           &tdArray,
+	}
+	err := Client.FindListByConfig(findByTopicDetailList, config)
+	if err != nil {
+		return nil, err
+	}
+	if tdArray == nil {
+		tdArray = make([]model.TopicDetail, 0)
+	}
+	return tdArray, err
+}
+
 const findByTopicDetail = `
 select * from topic_detail where topic_name = ?
 `
 
 func FindByTopicDetail(topicName string) (*model.TopicDetail, error) {
 	var td *model.TopicDetail
-	err := Client.FindFirst(findByTopicDetail, &td, topicName)
+	config := &mapstructure.DecoderConfig{
+		DecodeHook:       mapstructure.StringToTimeHookFunc("2006-01-02T15:04:05Z"),
+		WeaklyTypedInput: true,
+		Result:           &td,
+	}
+	err := Client.FindFirstByConfig(findByTopicDetail, config, topicName)
 	return td, err
 }
 
@@ -195,6 +222,14 @@ func FindTopicData(topicName string, offset int64, consumeCount int) ([]model.To
 		return make([]model.TopicData, 0), nil
 	}
 	return array, nil
+}
+
+const findTopicDataCount = `
+select count(1) from %s
+`
+
+func FindTopicDataCount(topicName string) (int64, error) {
+	return Client.Count(fmt.Sprintf(findTopicDataCount, getTopicDataTableName(topicName)))
 }
 
 func InsertTopicGroupTransaction(topic string, offset int64, body []byte) error {

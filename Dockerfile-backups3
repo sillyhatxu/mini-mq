@@ -1,0 +1,36 @@
+#FROM golang:1.12 AS builder
+#FROM xushikuan/alpine-build:1.0
+FROM golang:1.13-alpine
+
+ENV WORK_DIR=$GOPATH/src/github.com/sillyhatxu/mini-mq
+ENV TIME_ZONE=Asia/Singapore
+RUN ln -snf /usr/share/zoneinfo/$TIME_ZONE /etc/localtime && echo $TIME_ZONE > /etc/timezone
+
+WORKDIR $WORK_DIR
+
+RUN mkdir -p logs
+#COPY go.mod .
+#COPY go.sum .
+COPY . .
+#RUN go mod download
+#RUN go mod tidy
+RUN go mod vendor
+RUN go mod tidy
+
+RUN apk --update add \
+    go \
+    musl-dev
+RUN apk --update add \
+    util-linux-dev
+#RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o main main.go
+#RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -o main main.go
+RUN go build -a -ldflags "-linkmode external -extldflags '-static' -s -w" -o main.go
+RUN ls
+#RUN go build -a -ldflags "-linkmode external -extldflags '-static' -s -w" xcgo.go
+
+#COPY main .
+#COPY config.conf .
+#COPY basic.db ./data
+#COPY db db
+
+ENTRYPOINT ./mini-mq -c config.conf

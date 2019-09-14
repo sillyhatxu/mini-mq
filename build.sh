@@ -9,3 +9,10 @@ docker build -t xushikuan/mini-mq .
 docker tag xushikuan/mini-mq:latest xushikuan/mini-mq:1.0
 docker push xushikuan/mini-mq:1.0
 go clean
+
+
+
+docker stack deploy -c docker-compose.yml sillyhat
+
+
+docker stack deploy -c /root/server/docker-compose.mini-mq.yml sillyhat

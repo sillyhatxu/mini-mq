@@ -26,7 +26,7 @@ dep ensure -add github.com/foo/bar@1.0.0 github.com/foo/baz@master
 ### Updating dependencies
 
 ```
-dep ensure -update github.com/sillyhatxu/convenient-utils
+dep ensure -update github.com/sillyhatxu/logrus-client
 
 dep ensure -update
 ```
@@ -54,13 +54,18 @@ git push origin v1.0.2
 ### Initialize your project
 
 ```
-go mod init mini-mq
+go mod init github.com/sillyhatxu/mini-mq
 ```
 
 ### Updating dependencies
 
 ```
 go mod vendor
+```
+
+### Upgrading dependencies
+```
+go get github.com/sillyhatxu/logrus-client@v2.0.3
 ```
 
 ### verify dependencies

@@ -13,3 +13,9 @@ type TopicData struct {
 	Offset     int64  `json:"offset"`
 	Body       []byte `json:"body"`
 }
+
+type TopicDataDTO struct {
+	TopicName string `json:"topic_name"`
+	Offset    int64  `json:"offset"`
+	Body      string `json:"body"`
+}

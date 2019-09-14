@@ -13,7 +13,7 @@ type config struct {
 }
 
 type environmentConfig struct {
-	LogstashURL string `toml:"logstash_url" env:"logstash_url"`
+	LogstashURL string `toml:"logstash_url" env:"SILLYHAT.LOGSTASH.URL"`
 }
 
 type database struct {

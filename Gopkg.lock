@@ -18,12 +18,11 @@
   version = "v1.1.1"
 
 [[projects]]
-  digest = "1:3ee1d175a75b911a659fbd860060874c4f503e793c5870d13e5a0ede529a63cf"
+  digest = "1:a4b5a6b32f33323c7850fae4ec085a0fbac3be93c057b6b8cef5bcabe24645ac"
   name = "github.com/gin-contrib/sse"
   packages = ["."]
   pruneopts = "UT"
-  revision = "54d8467d122d380a14768b6b4e5cd7ca4755938f"
-  version = "v0.1.0"
+  revision = "5545eab6dad3bbbd6c5ae9186383c2a9d23c0dae"
 
 [[projects]]
   digest = "1:d8bd2a337f6ff2188e08f72c614f2f3f0fd48e6a7b37a071b197e427d77d3a47"
@@ -62,12 +61,12 @@
   version = "v1.1.1"
 
 [[projects]]
-  digest = "1:709cd2a2c29cc9b89732f6c24846bbb9d6270f28ef5ef2128cc73bd0d6d7bff9"
+  digest = "1:f5a2051c55d05548d2d4fd23d244027b59fbd943217df8aa3b5e170ac2fd6e1b"
   name = "github.com/json-iterator/go"
   packages = ["."]
   pruneopts = "UT"
-  revision = "27518f6661eba504be5a7a9a9f6d9460d892ade3"
-  version = "v1.1.7"
+  revision = "0ff49de124c6f76f8494e194af75bde0f1a49a29"
+  version = "v1.1.6"
 
 [[projects]]
   digest = "1:31e761d97c76151dde79e9d28964a812c46efc5baee4085b86f68f0c654450de"
@@ -97,12 +96,12 @@
   revision = "5c849dd2c51dd10faf5f1b86abec2db1ac3b9101"
 
 [[projects]]
-  digest = "1:36325ebb862e0382f2f14feef409ba9351271b89ada286ae56836c603d43b59c"
+  digest = "1:e150b5fafbd7607e2d638e4e5cf43aa4100124e5593385147b0a74e2733d8b0d"
   name = "github.com/mattn/go-isatty"
   packages = ["."]
   pruneopts = "UT"
-  revision = "e1f7b56ace729e4a73a29a6b4fac6cd5fcda7ab3"
-  version = "v0.0.9"
+  revision = "c2a7a6ca930a4cd0bc33a3f298eb71960732a3a7"
+  version = "v0.0.7"
 
 [[projects]]
   digest = "1:79e87abf06b873987dee86598950f5b51732ac454d5a5cab6445a14330e6c9e3"
@@ -193,18 +192,19 @@
   version = "v1.0.0"
 
 [[projects]]
-  digest = "1:cf80b5edbce9f4f8905e344f28d6060608812634e2c41316f3076b9be7d5ab86"
+  digest = "1:4a3d7630dcd5ab4f820e0d64034c0721afb549534023af0d3073f51c43a1cf08"
   name = "github.com/sillyhatxu/logrus-client"
   packages = [
     ".",
+    "constants",
     "fieldhook",
     "filehook",
     "logstashhook",
     "tcpclient",
   ]
   pruneopts = "UT"
-  revision = "5872752db7e3317b10e8d3d56f312826eef6994e"
-  version = "v2.0.1"
+  revision = "36a0b191be2c845426b2af3181d4619efd4f0a49"
+  version = "v2.0.4"
 
 [[projects]]
   digest = "1:76e0be37969db3c796e3fac2739bc15c0618c6a33ec1670e878eb35fcd79677a"
@@ -215,12 +215,12 @@
   version = "v1.0.1"
 
 [[projects]]
-  digest = "1:d11d617ea4b4e3f1168f0a138673a831781062fadf4ff5d4190a6f9a6d82cd60"
+  digest = "1:0d4b080507fdcb31ed711b582083a7425c229c8624ad1c9e4448f1657eff8690"
   name = "github.com/sillyhatxu/sqlite-client"
   packages = ["."]
   pruneopts = "UT"
-  revision = "6bf3c6e757da3619c3c4e81437a8ea43b32ce055"
-  version = "v1.0.0"
+  revision = "075445ec2943e10d8b133fa6599edd06baf7e49a"
+  version = "v1.0.1"
 
 [[projects]]
   digest = "1:04457f9f6f3ffc5fea48e71d62f2ca256637dee0a04d710288e27e05c8b41976"
@@ -239,16 +239,16 @@
   version = "v1.4.0"
 
 [[projects]]
-  digest = "1:5a1cf4e370bc86137b58da2ae065e76526d32b11f62a7665f36dbd5f41fa95ff"
+  digest = "1:d0072748c62defde1ad99dde77f6ffce492a0e5aea9204077e497c7edfb86653"
   name = "github.com/ugorji/go"
   packages = ["codec"]
   pruneopts = "UT"
-  revision = "23ab95ef5dc3b70286760af84ce2327a2b64ed62"
-  version = "v1.1.7"
+  revision = "2adff0894ba3bc2eeb9f9aea45fefd49802e1a13"
+  version = "v1.1.4"
 
 [[projects]]
   branch = "master"
-  digest = "1:72187a29e64824e997d1ee7391248da77ee4daef093fc0087b6cc683ab2982dc"
+  digest = "1:ec0b21c65dd414b1306ee9b9f6f2e7d631029dd4c4b274a7d37f332c5fbabe28"
   name = "golang.org/x/net"
   packages = [
     "http/httpguts",
@@ -259,15 +259,15 @@
     "trace",
   ]
   pruneopts = "UT"
-  revision = "a7b16738d86b947dd0fadb08ca2c2342b51958b6"
+  revision = "24e19bdeb0f2d062d8e2640d50a7aaf2a7f80e7a"
 
 [[projects]]
   branch = "master"
-  digest = "1:9a9d873379b3a947a4a1606caea86ce9c4aec8e5b0fae406c5785b052664eb16"
+  digest = "1:31ca8823684b4b0c204df1d4a9f3c511f41cc3e7ab6decc2ca5ffacc358d2818"
   name = "golang.org/x/sys"
   packages = ["unix"]
   pruneopts = "UT"
-  revision = "7ad0cfa0b7b5a50bdf0fb49923febdf3742a975c"
+  revision = "c3b328c6e5a763a2bfc82a48b4bd855037210934"
 
 [[projects]]
   digest = "1:8d8faad6b12a3a4c819a3f9618cb6ee1fa1cfc33253abeeea8b55336721e3405"
@@ -369,6 +369,7 @@
     "github.com/golang/protobuf/proto",
     "github.com/golang/protobuf/ptypes/empty",
     "github.com/google/uuid",
+    "github.com/mitchellh/mapstructure",
     "github.com/sillyhatxu/convenient-utils/response",
     "github.com/sillyhatxu/environment-config",
     "github.com/sillyhatxu/gocache-client",

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/sillyhatxu/gocache-client"
 	"github.com/sillyhatxu/mini-mq/dbclient"
+	"github.com/sillyhatxu/mini-mq/dto"
 	"github.com/sillyhatxu/mini-mq/model"
 	"github.com/sillyhatxu/mini-mq/utils/cache"
 	"github.com/sirupsen/logrus"
@@ -49,6 +50,10 @@ func deleteTopicDetailMap(topicName string) {
 	topicDetailMap := getTopicDetailMap()
 	delete(topicDetailMap, topicName)
 	cache.Client.Set(topicDetailKey, topicDetailMap, client.NoExpiration)
+}
+
+func FindTopicList() ([]model.TopicDetail, error) {
+	return dbclient.FindByTopicDetailList()
 }
 
 func FindTopic(topicName string) (*model.TopicDetail, error) {
@@ -127,6 +132,43 @@ func DeleteTopic(topicName string) error {
 	}
 	deleteTopicDetailMap(topicName)
 	return dbclient.DeleteTopic(topicName, topicGroupArray)
+}
+
+func FindTopicData(topicName string, offset int64, limit int) ([]dto.TopicDataDTO, int64, error) {
+	var mutex sync.Mutex
+	mutex.Lock()
+	defer mutex.Unlock()
+	td, err := FindTopic(topicName)
+	if err != nil {
+		return nil, 0, err
+	}
+	if td == nil {
+		return nil, 0, fmt.Errorf("topic[%s] does not exist", topicName)
+	}
+	count, err := dbclient.FindTopicDataCount(topicName)
+	if err != nil {
+		return nil, 0, err
+	}
+	if count == 0 {
+		return make([]dto.TopicDataDTO, 0), 0, nil
+	}
+	array, err := dbclient.FindTopicData(topicName, offset, limit)
+	if err != nil {
+		return nil, 0, err
+	}
+	return switchTopicDataToDTO(array), count, nil
+}
+
+func switchTopicDataToDTO(array []model.TopicData) []dto.TopicDataDTO {
+	var resultArray []dto.TopicDataDTO
+	for _, td := range array {
+		resultArray = append(resultArray, dto.TopicDataDTO{
+			TopicName: td.TopicName,
+			Offset:    td.Offset,
+			Body:      string(td.Body),
+		})
+	}
+	return resultArray
 }
 
 func getTopicGroupMap() map[string]*model.TopicGroup {

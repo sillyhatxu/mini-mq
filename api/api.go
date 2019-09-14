@@ -8,6 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"net"
 	"net/http"
+	"strconv"
 )
 
 func InitialAPI(listener net.Listener) {
@@ -121,10 +122,50 @@ func deleteTopic(context *gin.Context) {
 }
 
 func getTopic(context *gin.Context) {
-	context.JSON(http.StatusOK, response.ServerSuccess(nil, nil))
+	topicName := context.Param("topicName")
+	if topicName == "" {
+		context.JSON(http.StatusOK, response.ServerError(nil, "topicName is required", nil))
+		return
+	}
+	q := context.Request.URL.Query()
+	offsetReq := q["offset"]
+	limitReq := q["limit"]
+	var offset int64 = 0
+	var limit int = 20
+	if offsetReq != nil && len(offsetReq) > 0 {
+		i, err := strconv.ParseInt(offsetReq[0], 10, 64)
+		if err != nil {
+			context.JSON(http.StatusOK, response.ServerError(nil, "offset must be number", nil))
+			return
+		}
+		offset = i
+	}
+	if limitReq != nil && len(limitReq) > 0 {
+		i, err := strconv.Atoi(limitReq[0])
+		if err != nil {
+			context.JSON(http.StatusOK, response.ServerError(nil, "limit must be number", nil))
+			return
+		}
+		limit = i
+	}
+	logrus.Infof("[getTopic] topicName [%s]; offset [%d]; limit [%d]", topicName, offset, limit)
+	array, count, err := topic.FindTopicData(topicName, offset, limit)
+	if err != nil {
+		logrus.Errorf("[topicList] topic list error : %v", err)
+		context.JSON(http.StatusOK, response.ServerError(nil, err.Error(), nil))
+		return
+	}
+	logrus.Infof("[getTopic] topicName [%s]; offset [%d]; limit [%d] response : %#v ; totalCount : %d", topicName, offset, limit, array, count)
+	context.JSON(http.StatusOK, response.ServerSuccess(array, count))
 }
 
 func topicList(context *gin.Context) {
-
-	context.JSON(http.StatusOK, response.ServerSuccess(nil, nil))
+	array, err := topic.FindTopicList()
+	if err != nil {
+		logrus.Errorf("[topicList] topic list error : %v", err)
+		context.JSON(http.StatusOK, response.ServerError(nil, err.Error(), nil))
+		return
+	}
+	logrus.Infof("[topicList] response : %#v", array)
+	context.JSON(http.StatusOK, response.ServerSuccess(array, nil))
 }
