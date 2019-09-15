@@ -11,12 +11,32 @@ import (
 )
 
 type Client struct {
-	Address string
-	Timeout time.Duration
+	address string
+	timeout time.Duration
+}
+
+func NewClient(address string, opts ...Option) *Client {
+	//default
+	client := &Client{
+		address: address,
+		timeout: 5 * time.Second,
+	}
+	for _, opt := range opts {
+		opt(client)
+	}
+	return client
+}
+
+type Option func(*Client)
+
+func Timeout(timeout time.Duration) Option {
+	return func(c *Client) {
+		c.timeout = timeout
+	}
 }
 
 func (c *Client) GetConnection() (*grpc.ClientConn, error) {
-	return grpc.Dial(c.Address, grpc.WithInsecure())
+	return grpc.Dial(c.address, grpc.WithInsecure())
 }
 
 func (c Client) GetTopicData(TopicName string, TopicGroup string, Offset int64, ConsumeCount int32) (*consumer.ConsumeResponse_Body, error) {
@@ -26,7 +46,7 @@ func (c Client) GetTopicData(TopicName string, TopicGroup string, Offset int64, 
 	}
 	defer conn.Close()
 	consumerClient := consumer.NewConsumerServiceClient(conn)
-	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout)
+	ctx, cancel := context.WithTimeout(context.Background(), c.timeout)
 	defer cancel()
 	response, err := consumerClient.Consume(ctx, &consumer.ConsumeRequest{
 		TopicName:    TopicName,
@@ -50,7 +70,7 @@ func (c Client) Commit(topicName string, topicGroup string, latestOffset int64) 
 	}
 	defer conn.Close()
 	consumerClient := consumer.NewConsumerServiceClient(conn)
-	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout)
+	ctx, cancel := context.WithTimeout(context.Background(), c.timeout)
 	defer cancel()
 	response, err := consumerClient.Commit(ctx, &consumer.CommitRequest{
 		TopicName:    topicName,
@@ -73,7 +93,7 @@ func (c Client) Produce(topicName string, body []byte) error {
 	}
 	defer conn.Close()
 	producerClient := producer.NewProducerServiceClient(conn)
-	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout)
+	ctx, cancel := context.WithTimeout(context.Background(), c.timeout)
 	defer cancel()
 	response, err := producerClient.Produce(ctx, &producer.ProduceRequest{
 		TopicName: topicName,

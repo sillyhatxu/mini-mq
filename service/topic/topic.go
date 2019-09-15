@@ -179,6 +179,8 @@ func getTopicGroupMap() map[string]*model.TopicGroup {
 		value, found := cache.Client.Get(topicGroupKey)
 		if !found {
 			logrus.Infof("initial topic group map[%s]", topicGroupKey)
+			topicGroupMap := make(map[string]*model.TopicGroup)
+			cache.Client.Set(topicGroupKey, topicGroupMap, client.NoExpiration)
 			continue
 		}
 		return value.(map[string]*model.TopicGroup)

@@ -52,6 +52,8 @@ func GetConsumingMap() map[string]*Consuming {
 		value, found := cache.Client.Get(consumingKey)
 		if !found {
 			logrus.Infof("initial consuming map[%s]", consumingKey)
+			consumingMap := make(map[string]*Consuming)
+			cache.Client.Set(consumingKey, consumingMap, client.NoExpiration)
 			continue
 		}
 		return value.(map[string]*Consuming)

@@ -1,24 +1,35 @@
 package producer
 
 import (
-	"github.com/sillyhatxu/mini-mq/client"
+	"fmt"
+	"github.com/sillyhatxu/mini-mq/client/client"
 )
 
 type ProducerClient struct {
-	TopicName string
-	Body      []byte
-	Client    *client.Client
+	topicName string
+	client    *client.Client
+}
+
+func NewProducerClient(client *client.Client, topicName string) *ProducerClient {
+	return &ProducerClient{
+		client:    client,
+		topicName: topicName,
+	}
 }
 
 func (pc ProducerClient) Validate() error {
-	//TODO Validate
+	if pc.client == nil {
+		return fmt.Errorf("client is nil")
+	} else if pc.topicName == "" {
+		return fmt.Errorf("topicName is nil")
+	}
 	return nil
 }
 
-func (pc ProducerClient) Produce() error {
+func (pc ProducerClient) Produce(body []byte) error {
 	err := pc.Validate()
 	if err != nil {
 		return err
 	}
-	return pc.Client.Produce(pc.TopicName, pc.Body)
+	return pc.client.Produce(pc.topicName, body)
 }

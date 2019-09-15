@@ -1,7 +1,7 @@
 package consumer
 
 import (
-	"github.com/sillyhatxu/mini-mq/client"
+	"github.com/sillyhatxu/mini-mq/client/client"
 	"github.com/sirupsen/logrus"
 	"testing"
 	"time"
@@ -10,7 +10,7 @@ import (
 const (
 	Address      = "localhost:8082"
 	TopicName    = "test_topic"
-	TopicGroup   = "test-3"
+	TopicGroup   = "test-1"
 	Offset       = 0
 	ConsumeCount = 5
 )
@@ -22,23 +22,11 @@ func (ct ConsumerTest) MessageDelivery(delivery Delivery) error {
 	return nil
 }
 
+var Client = client.NewClient("localhost:8200", client.Timeout(30*time.Second))
+
 func TestClient_Consume(t *testing.T) {
-	Client := &ConsumerClient{
-		TopicName:    TopicName,
-		TopicGroup:   TopicGroup,
-		Offset:       Offset,
-		ConsumeCount: ConsumeCount,
-		Client: &client.Client{
-			Address: Address,
-			Timeout: 60 * time.Second,
-		},
-		Config: &ConsumerConfig{
-			Hearbeat: 5 * time.Second,
-			NoWait:   true,
-			AutoAck:  true,
-		},
-	}
-	err := Client.Consume(&ConsumerTest{})
+	consume := NewConsumerClient(Client, TopicName, TopicGroup, Offset, ConsumeCount)
+	err := consume.Consume(&ConsumerTest{})
 	if err != nil {
 		panic(err)
 	}
