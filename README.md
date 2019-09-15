@@ -6,6 +6,8 @@
 
 [producer](https://github.com/sillyhatxu/mini-mq/blob/master/client/producer/producer_test.go)
 
+[mini-mq-example](https://github.com/sillyhatxu/mini-mq-example)
+
 
 ## develop backups
 

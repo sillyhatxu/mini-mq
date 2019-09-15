@@ -131,6 +131,9 @@ func (cc ConsumerClient) messageDelivery() (<-chan Delivery, error) {
 			if err != nil {
 				continue
 			}
+			if delivery.TopicDataArray == nil || len(delivery.TopicDataArray) == 0 {
+				continue
+			}
 			deliveryChannel <- *delivery
 		}
 	}()

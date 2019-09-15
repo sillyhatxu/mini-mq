@@ -210,6 +210,10 @@ func deleteTopicGroupMap(tg *model.TopicGroup) {
 	cache.Client.Set(topicGroupKey, topicGroupMap, client.NoExpiration)
 }
 
+func FindTopicGroupList(offset int64, limit int) ([]model.TopicGroup, error) {
+	return dbclient.FindTopicGroupList(offset, limit)
+}
+
 func FindTopicGroup(topicName string, topicGroup string, offset int64) (*model.TopicGroup, error) {
 	var mutex sync.Mutex
 	mutex.Lock()

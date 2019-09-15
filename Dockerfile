@@ -27,5 +27,4 @@ COPY --from=builder $BUILDER_WORK_DIR/main $WORK_DIR
 COPY --from=builder $BUILDER_WORK_DIR/config.conf $WORK_DIR
 COPY --from=builder $BUILDER_WORK_DIR/db $WORK_DIR/db
 COPY --from=builder $BUILDER_WORK_DIR/basic.db $WORK_DIR/data
-RUN ls
 ENTRYPOINT ./main -c config.conf

@@ -18,7 +18,8 @@ const (
 type ConsumerTest struct{}
 
 func (ct ConsumerTest) MessageDelivery(delivery Delivery) error {
-	logrus.Infof("delivery { TopicName:%v, TopicGroup:%v, LatestOffset:%v }", delivery.TopicName, delivery.TopicGroup, delivery.LatestOffset)
+	logrus.Infof("delivery { TopicName:%v, TopicGroup:%v, LatestOffset:%v , data length : %d}", delivery.TopicName, delivery.TopicGroup, delivery.LatestOffset, len(delivery.TopicDataArray))
+
 	return nil
 }
 

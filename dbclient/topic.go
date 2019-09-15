@@ -167,6 +167,22 @@ func FindByTopicDetail(topicName string) (*model.TopicDetail, error) {
 	return td, err
 }
 
+const findTopicGroupList = `
+select * from topic_group limit ?,?
+`
+
+func FindTopicGroupList(offset int64, limit int) ([]model.TopicGroup, error) {
+	var array []model.TopicGroup
+	err := Client.FindList(findTopicGroupList, &array, offset, limit)
+	if err != nil {
+		return nil, err
+	}
+	if array == nil {
+		return make([]model.TopicGroup, 0), nil
+	}
+	return array, nil
+}
+
 const findByTopicGroup = `
 select * from topic_group where topic_name = ? and topic_group = ?
 `

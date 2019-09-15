@@ -41,6 +41,10 @@ func SetupRouter() *gin.Engine {
 		topicGroup.GET("", topicList)
 		topicGroup.GET("/:topicName", getTopic)
 	}
+	tgGroup := router.Group("/topic-group")
+	{
+		tgGroup.GET("", topicGroupList)
+	}
 	return router
 }
 
@@ -167,5 +171,38 @@ func topicList(context *gin.Context) {
 		return
 	}
 	logrus.Infof("[topicList] response : %#v", array)
+	context.JSON(http.StatusOK, response.ServerSuccess(array, nil))
+}
+
+func topicGroupList(context *gin.Context) {
+	q := context.Request.URL.Query()
+	offsetReq := q["offset"]
+	limitReq := q["limit"]
+	var offset int64 = 0
+	var limit int = 20
+	if offsetReq != nil && len(offsetReq) > 0 {
+		i, err := strconv.ParseInt(offsetReq[0], 10, 64)
+		if err != nil {
+			context.JSON(http.StatusOK, response.ServerError(nil, "offset must be number", nil))
+			return
+		}
+		offset = i
+	}
+	if limitReq != nil && len(limitReq) > 0 {
+		i, err := strconv.Atoi(limitReq[0])
+		if err != nil {
+			context.JSON(http.StatusOK, response.ServerError(nil, "limit must be number", nil))
+			return
+		}
+		limit = i
+	}
+	logrus.Infof("[topicGroupList] offset [%d]; limit [%d]", offset, limit)
+	array, err := topic.FindTopicGroupList(offset, limit)
+	if err != nil {
+		logrus.Errorf("[topicList] topic list error : %v", err)
+		context.JSON(http.StatusOK, response.ServerError(nil, err.Error(), nil))
+		return
+	}
+	logrus.Infof("[topicGroupList] response : %#v", array)
 	context.JSON(http.StatusOK, response.ServerSuccess(array, nil))
 }
