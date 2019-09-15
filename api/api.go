@@ -24,7 +24,7 @@ func InitialAPI(listener net.Listener) {
 
 func SetupRouter() *gin.Engine {
 	router := gin.Default()
-	router.GET("/health", func(c *gin.Context) { c.JSON(200, gin.H{"message": "OK"}) })
+	router.GET("/health", func(c *gin.Context) { c.JSON(200, gin.H{"status": "UP", "message": "OK"}) })
 	usersGroup := router.Group("/users")
 	{
 		usersGroup.POST("", addUser)
