@@ -11,7 +11,7 @@ import (
 	"github.com/sillyhatxu/mini-mq/dbclient"
 	"github.com/sillyhatxu/mini-mq/grpc/server"
 	"github.com/sillyhatxu/mini-mq/utils/cache"
-	"log"
+	"github.com/sirupsen/logrus"
 	"net"
 )
 
@@ -28,8 +28,8 @@ func init() {
 			panic(fmt.Sprintf("unmarshal toml object error. %v", err))
 		}
 	})
-	log.Printf("config.Conf : %#v", config.Conf)
 	config.InitialLogConfig()
+	logrus.Infof("config.Conf : %#v", config.Conf)
 }
 
 func main() {
