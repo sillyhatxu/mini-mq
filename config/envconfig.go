@@ -5,6 +5,7 @@ var Conf config
 type config struct {
 	Project   string
 	Module    string
+	Host      string
 	HttpPort  int               `toml:"http_port"`
 	GRPCPort  int               `toml:"grpc_port"`
 	Log       logConf           `toml:"log_conf"`
@@ -13,7 +14,8 @@ type config struct {
 }
 
 type environmentConfig struct {
-	LogstashURL string `toml:"logstash_url" env:"SILLYHAT.LOGSTASH.URL"`
+	LogstashURL   string `toml:"logstash_url" env:"SILLYHAT.LOGSTASH.URL"`
+	ConsulAddress string `toml:"consul_address" env:"SILLYHAT.HOST.CONSUL"`
 }
 
 type database struct {
